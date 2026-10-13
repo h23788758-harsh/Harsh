@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Harsh AI" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Harsh AI</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --text: #f5f5f5;
+      --text2: #a0a0a0;
+      --accent: #1d9bf0;
+      --accent-soft: rgba(29, 155, 240, 0.15);
+      --border: #2a2a2a;
+      --user-bg: #1d9bf0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+    body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
+    .status-bar { height: env(safe-area-inset-top, 0px); background: var(--bg); }
+    header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 50; }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, #1d9bf0, #0a7bc2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; }
+    .logo-text { font-size: 18px; font-weight: 600; }
+    .logo-text span { color: var(--accent); }
+    .header-btn { width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--surface); color: var(--text2); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .home-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 22px 90px; text-align: center; }
+    .home-title { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 6px; }
+    .home-title span { color: var(--accent); }
+    .home-sub { color: var(--text2); font-size: 14px; margin-bottom: 32px; }
+    .search-wrap { width: 100%; position: relative; margin-bottom: 24px; }
+    .search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 16px 56px 16px 20px; font-size: 16px; color: var(--text); outline: none; }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap input::placeholder { color: #666; }
+    .search-wrap button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .chip { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 9px 14px; font-size: 13px; color: var(--text2); cursor: pointer; }
+    .chip:active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+    .chat-view { display: none; flex-direction: column; height: 100%; }
+    .chat-view.active { display: flex; }
+    .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .msg { max-width: 90%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; animation: in 0.2s ease; }
+    @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .msg.user { align-self: flex-end; background: var(--user-bg); color: white; border-bottom-right-radius: 5px; }
+    .msg.bot { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); border-bottom-left-radius: 5px; }
+    .msg.bot .bot-name { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 5px; }
+    .msg.bot .src { margin-top: 8px; font-size: 11px; color: var(--text2); }
+    .typing { display: flex; gap: 4px; padding: 6px 0; }
+    .typing i { width: 6px; height: 6px; background: #666; border-radius: 50%; animation: bounce 1.1s infinite; }
+    .typing i:nth-child(2) { animation-delay: 0.15s; }
+    .typing i:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+    .input-bar { padding: 10px 12px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--bg); border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
+    .input-bar input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 13px 16px; font-size: 15px; color: var(--text); outline: none; }
+    .input-bar input:focus { border-color: var(--accent); }
+    .input-bar button { width: 46px; height: 46px; border-radius: 50%; border: none; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .input-bar button:disabled { opacity: 0.4; }
+    .bottom-nav { display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 6px 0; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+    .nav-btn { flex: 1; background: none; border: none; color: var(--text2); font-size: 11px; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+    .nav-btn.active { color: var(--accent); }
+    .nav-btn svg { width: 22px; height: 22px; }
+    .install-bar { display: none; background: var(--accent); color: white; text-align: center; padding: 10px; font-size: 13px; }
+    .install-bar.show { display: block; }
+    .install-bar button { background: white; color: var(--accent); border: none; border-radius: 14px; padding: 5px 12px; font-weight: 600; margin-left: 8px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="status-bar"></div>
+  <div class="install-bar" id="installBar">Home screen pe add karo <button id="installBtn">Install</button></div>
+  <header>
+    <div class="logo"><div class="logo-icon">H</div><div class="logo-text">Harsh <span>AI</span></div></div>
+    <button class="header-btn" id="clearBtn">🗑️</button>
+  </header>
+  <main>
+    <div class="home-view" id="homeView">
+      <div class="home-title">Harsh <span>AI</span></div>
+      <div class="home-sub">Kuch bhi poochho • Fast answers</div>
+      <div class="search-wrap">
+        <input type="text" id="homeInput" placeholder="Type your question..." autocomplete="off" />
+        <button id="homeBtn" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+      </div>
+      <div class="chips">
+        <div class="chip" data-q="What is artificial intelligence">AI kya hai</div>
+        <div class="chip" data-q="Who is Elon Musk">Elon Musk</div>
+        <div class="chip" data-q="Capital of India">India capital</div>
+        <div class="chip" data-q="How to make tea">Chai recipe</div>
+        <div class="chip" data-q="Tell me a joke">Joke sunao</div>
+        <div class="chip" data-q="Best phone under 20000">Budget phone</div>
+      </div>
+    </div>
+    <div class="chat-view" id="chatView">
+      <div class="messages" id="messages"></div>
+      <div class="input-bar">
+        <input type="text" id="chatInput" placeholder="Message..." autocomplete="off" />
+        <button id="sendBtn" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
+    </div>
+  </main>
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-view="home" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </button>
+    <button class="nav-btn" data-view="chat" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Chat
+    </button>
+  </nav>
+  <script>
+    const homeView = document.getElementById('homeView');
+    const chatView = document.getElementById('chatView');
+    const messages = document.getElementById('messages');
+    const homeInput = document.getElementById('homeInput');
+    const homeBtn = document.getElementById('homeBtn');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const chips = document.querySelectorAll('.chip');
+    let busy = false;
+
+    function showView(view) {
+      navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === view));
+      if (view === 'home') {
+        homeView.style.display = 'flex';
+        chatView.classList.remove('active');
+      } else {
+        homeView.style.display = 'none';
+        chatView.classList.add('active');
+        chatInput.focus();
+      }
+    }
+    navBtns.forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
+    function openChat() { showView('chat'); renderSavedHistory(); }
+
+    function addMsg(text, isUser, plainText = false) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + (isUser ? 'user' : 'bot');
+      if (isUser) {
+        div.textContent = text;
+      } else if (plainText) {
+        const name = document.createElement('div');
+        name.className = 'bot-name';
+        name.textContent = 'Harsh';
+        const body = document.createElement('div');
+        body.style.whiteSpace = 'pre-wrap';
+        body.textContent = text;
+        div.append(name, body);
+      } else {
+        div.innerHTML = '<div class="bot-name">Harsh</div><div>' + text + '</div>';
+      }
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+    function showTyping() {
+      const div = document.createElement('div');
+      div.className = 'msg bot';
+      div.id = 'typing';
+      div.innerHTML = '<div class="bot-name">Harsh</div><div class="typing"><i></i><i></i><i></i></div>';
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+    function hideTyping() {
+      const t = document.getElementById('typing');
+      if (t) t.remove();
+    }
+
+    function localAnswer(q) {
+      q = q.toLowerCase().trim();
+      if (/^(hi|hello|hey|namaste|hii|hlo)$/.test(q)) return "Namaste! Main <b>Harsh</b> hoon. Kuch bhi poochho.";
+      if (/who are you|tum kaun|naam kya|your name/.test(q)) return "Mera naam <b>Harsh</b> hai. Main aapka AI assistant hoon.";
+      if (/thank|shukriya|dhanyavad/.test(q)) return "Welcome! Aur kuch chahiye toh poochho.";
+      if (/joke|chutkula|hasao|funny/.test(q)) {
+        const j = ["Teacher: Late kyun?<br>Student: Board tha — School Ahead, Go Slow","Doctor: Problem kya hai?<br>Patient: Mujhe bhoolne ki bimari hai.<br>Doctor: Kab se?<br>Patient: Kaun si bimari?","Pati: Aaj surprise dunga.<br>Patni: Kya?<br>Pati: Bartan dhounga.<br>Patni: Yeh miracle hai!"];
+        return j[Math.floor(Math.random() * j.length)];
+      }
+      if (/time|samay|date|tarikh/.test(q)) {
+        const n = new Date();
+        return "Time: <b>" + n.toLocaleTimeString('en-IN') + "</b><br>Date: <b>" + n.toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) + "</b>";
+      }
+      if (/chai|tea|how to make tea/.test(q)) return "<b>Chai Recipe:</b><br>1. Paani + doodh garam karo<br>2. Chai patti + cheeni daalo<br>3. Adrak daal sakte ho<br>4. 3-4 min pakao, chhan lo";
+      if (/phone|mobile|under 20000|budget phone/.test(q)) return "₹20k under options:<br>• Poco X6 Pro – Performance<br>• Realme Narzo 70 – Camera<br>• Samsung M35 – Software<br>• Motorola G85 – Clean UI";
+      if (/motivate|motivation|sad|udaas|himmat/.test(q)) return "Haar maan lena asaan hai.<br>Phir se khade hona hi asli baat hai.<br><br>Tum kar sakte ho. Main saath hoon.";
+      try {
+        const expr = q.replace(/x|×/g, '*').replace(/[^0-9+\-*/().]/g, '');
+        if (/^[\d+\-*/().]+$/.test(expr) && expr.length > 2) {
+          const r = Function('"use strict";return (' + expr + ')')();
+          if (typeof r === 'number' && isFinite(r)) return "Answer: <b>" + r + "</b>";
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    async function webSearch(query) {
+      try {
+        const url = 'https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_html=1&skip_disambig=1';
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.AbstractText && data.AbstractText.length > 25) {
+          let t = data.AbstractText;
+          if (data.AbstractSource) t += '<div class="src">Source: ' + data.AbstractSource + '</div>';
+          return t;
+        }
+        if (data.Answer) return data.Answer;
+        if (data.Definition && data.Definition.length > 15) {
+          let t = data.Definition;
+          if (data.DefinitionSource) t += '<div class="src">Source: ' + data.DefinitionSource + '</div>';
+          return t;
+        }
+        if (data.RelatedTopics && data.RelatedTopics.length) {
+          let html = '', c = 0;
+          for (const t of data.RelatedTopics) {
+            if (t.Text && c < 3) { html += '• ' + t.Text + '<br><br>'; c++; }
+          }
+          if (c) return html.trim();
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    const HISTORY_KEY = 'harsh-ai-chat-history-v1';
+    const MAX_HISTORY = 20;
+    let chatHistory = [];
+    try {
+      const saved = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      if (Array.isArray(saved)) {
+        chatHistory = saved.filter(m => m && ['user', 'assistant'].includes(m.role) && typeof m.content === 'string').slice(-MAX_HISTORY);
+      }
+    } catch (_) { chatHistory = []; }
+
+    function saveHistory() {
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(chatHistory.slice(-MAX_HISTORY))); }
+      catch (_) { /* Storage may be disabled or full; chat can still work. */ }
+    }
+    function renderSavedHistory() {
+      if (messages.children.length || !chatHistory.length) return;
+      chatHistory.forEach(m => addMsg(m.content, m.role === 'user', true));
+    }
+
+    async function ask(query) {
+      query = (query || '').trim();
+      if (!query || busy) return;
+      busy = true;
+      openChat();
+      renderSavedHistory();
+      addMsg(query, true);
+      chatHistory.push({ role: 'user', content: query });
+      chatHistory = chatHistory.slice(-MAX_HISTORY);
+      saveHistory();
+      showTyping();
+      sendBtn.disabled = true;
+      homeBtn.disabled = true;
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: chatHistory })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'AI service se jawab nahi mila.');
+        if (!data.reply) throw new Error('AI ne khaali jawab diya. Dobara try karo.');
+        hideTyping();
+        addMsg(data.reply, false, true);
+        chatHistory.push({ role: 'assistant', content: data.reply });
+        chatHistory = chatHistory.slice(-MAX_HISTORY);
+        saveHistory();
+      } catch (error) {
+        hideTyping();
+        addMsg('Connection error: ' + (error.message || 'Server se connect nahi hua.') + '\n\nCheck karo ki Harsh AI server chal raha hai aur internet available hai.', false, true);
+        // Keep the user question in local history so it can be retried in context.
+      } finally {
+        busy = false;
+        sendBtn.disabled = false;
+        homeBtn.disabled = false;
+        homeInput.value = '';
+        chatInput.value = '';
+        chatInput.focus();
+      }
+    }
+
+    homeBtn.addEventListener('click', function() { ask(homeInput.value); });
+    homeInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); ask(homeInput.value); } });
+    sendBtn.addEventListener('click', function() { ask(chatInput.value); });
+    chatInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); ask(chatInput.value); } });
+    chips.forEach(function(chip) { chip.addEventListener('click', function() { ask(chip.getAttribute('data-q')); }); });
+    clearBtn.addEventListener('click', function() { messages.innerHTML = ''; chatHistory = []; saveHistory(); addMsg('Chat clear. Naya sawal poochho!', false, true); welcomed = true; });
+
+    let welcomed = false;
+    document.querySelector('[data-view="chat"]').addEventListener('click', function() {
+      if (!welcomed && messages.children.length === 0) {
+        addMsg('Namaste! Main <b>Harsh</b> hoon. Kuch bhi poochho.', false);
+        welcomed = true;
+      }
+    });
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installBar').classList.add('show');
+    });
+    document.getElementById('installBtn').addEventListener('click', async function() {
+      if (!deferredPrompt) { alert('Chrome menu → Add to Home screen'); return; }
+      deferredPrompt.prompt();
+      const result = await deferredPrompt.userChoice;
+      if (result.outcome === 'accepted') document.getElementById('installBar').classList.remove('show');
+      deferredPrompt = null;
+    });
+  </script>
+</body>
+</html>
